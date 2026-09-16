@@ -1,0 +1,29 @@
+[package]
+name = "argos-gui"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+build = "build.rs"
+publish = false
+
+[build-dependencies]
+tauri-build.workspace = true
+
+[dependencies]
+# `serde` feature lets seed-bearing command inputs deserialize directly into
+# `SecretString` at the Tauri boundary, so the cleartext seed is never held in
+# a plain `String` field carrying `Debug`/`Serialize` (audit Issue A).
+secrecy = { workspace = true, features = ["serde"] }
+serde.workspace = true
+serde_json.workspace = true
+tauri.workspace = true
+tauri-plugin-opener.workspace = true
+tauri-plugin-dialog.workspace = true
+tokio.workspace = true
+# Surface argos-core diagnostics (scan reconnects, donation decisions/fallbacks)
+# to the dev console / stderr. Both are already workspace dependencies.
+tracing.workspace = true
+tracing-subscriber.workspace = true
+argos-core = { path = "../../crates/zeck-core" }

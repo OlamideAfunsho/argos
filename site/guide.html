@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="User guide for recovering ZecWallet Lite seeds, legacy wallet files, and Zcash spending keys with Argos Rescue Wallet."
+    />
+    <meta name="theme-color" content="#5d8aa8" />
+    <link rel="canonical" href="https://argos.sovright.com/guide.html" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Sovright" />
+    <meta property="og:title" content="Argos User Guide | Sovright" />
+    <meta
+      property="og:description"
+      content="Follow the Argos recovery workflow from source selection through inspection, scan, sweep, troubleshooting, and report export."
+    />
+    <meta property="og:url" content="https://argos.sovright.com/guide.html" />
+    <meta property="og:image" content="https://argos.sovright.com/assets/zeck-og.png" />
+    <meta
+      property="og:image:secure_url"
+      content="https://argos.sovright.com/assets/zeck-og.png"
+    />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Argos Rescue Wallet social card with Sovright branding and a desktop recovery preview."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Argos User Guide | Sovright" />
+    <meta
+      name="twitter:description"
+      content="Install and use Argos to recover legacy Zcash wallets and spending keys safely."
+    />
+    <meta name="twitter:image" content="https://argos.sovright.com/assets/zeck-og.png" />
+    <meta
+      name="twitter:image:alt"
+      content="Argos Rescue Wallet social card with Sovright branding and a desktop recovery preview."
+    />
+    <title>Argos User Guide | Sovright</title>
+    <link rel="icon" href="./assets/zeck-icon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="Argos home">
+        <img src="./assets/zeck-icon.svg" alt="" width="32" height="32" />
+        <span>Argos</span>
+      </a>
+      <div class="header-right">
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="./index.html">Splash Page</a>
+          <a href="#before">Before You Start</a>
+          <a href="#walkthrough">Walkthrough</a>
+          <a href="#troubleshooting">Troubleshooting</a>
+          <a href="./index.html#help">Get help</a>
+        </nav>
+        <a class="sovright-mark" href="https://sovright.com" aria-label="Sovright">
+          <img src="./assets/sovright-logo-caption.svg" alt="Sovright" />
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <section class="guide-hero">
+        <p class="eyebrow">User Guide</p>
+        <h1>Recover a legacy Zcash wallet with Argos</h1>
+        <p>
+          This guide follows the desktop wizard from first launch through scan, sweep, and recovery
+          report export. Read the safety notes before opening a wallet with real funds.
+        </p>
+      </section>
+
+      <section class="guide-layout">
+        <aside class="toc" aria-label="Guide table of contents">
+          <a href="#before">Before you start</a>
+          <a href="#install">Install</a>
+          <a href="#walkthrough">Recovery walkthrough</a>
+          <a href="#sprout">Sprout recovery</a>
+          <a href="#report">Recovery report</a>
+          <a href="#troubleshooting">Troubleshooting</a>
+          <a href="#security">Security checklist</a>
+        </aside>
+
+        <article class="guide-content">
+          <section id="before">
+            <h2>Before You Start</h2>
+            <p>
+              Argos accepts a 24-word ZecWallet Lite seed, a ZecWallet Lite or zcashd wallet file,
+              or a standalone Sapling spending key. It also recovers Sprout from zcashd wallet
+              files; the CLI accepts standalone Sprout keys. You need a trusted computer, internet
+              access, and a modern Zcash destination you control.
+            </p>
+            <div class="callout">
+              <strong>Do not type your seed into this website.</strong>
+              <span>
+                The splash page and user guide are documentation only. Seeds, wallet files,
+                passphrases, and spending keys belong only in the signed Argos application.
+              </span>
+            </div>
+            <h3>Have ready</h3>
+            <ul>
+              <li>Your seed phrase, original wallet file, or standalone spending-key backup.</li>
+              <li>A Zcash Unified Address from a wallet you control.</li>
+              <li>A recovery workspace folder with enough disk space for synced wallet state.</li>
+              <li>A rough wallet creation date or block height, if known.</li>
+            </ul>
+          </section>
+
+          <section id="install">
+            <h2>Install</h2>
+            <ol>
+              <li>Download the correct Argos release for your operating system.</li>
+              <li>Verify the release signature or checksum when published with the build.</li>
+              <li>Install the app on a computer you trust and keep updated.</li>
+              <li>Open Argos and confirm the app title says ZecWallet Lite Recovery.</li>
+            </ol>
+          </section>
+
+          <section id="walkthrough">
+            <h2>Recovery Walkthrough</h2>
+            <h3>1. Welcome</h3>
+            <p>
+              Choose <strong>I have my 24-word seed phrase</strong> for the legacy ZecWallet Lite
+              HD path, or <strong>I have a wallet file</strong> for a ZecWallet Lite file, zcashd
+              <code>wallet.dat</code>, or standalone Sapling key. A seed recovery does not require
+              a wallet file.
+            </p>
+
+            <h3>2a. Seed Entry</h3>
+            <p>
+              Paste the full seed phrase and click <strong>Validate seed</strong>. Argos checks the
+              word count and BIP-39 checksum locally. The app clears the seed field after a scan
+              session starts.
+            </p>
+
+            <h3>2b. Wallet File or Sapling Key</h3>
+            <p>
+              Choose, drag, or enter the path to a wallet file. Argos reads the file but never
+              modifies it. For an encrypted wallet, enter the passphrase when prompted; it is used
+              in memory and is not written to disk. Review the counts for transparent, Sapling,
+              and Sprout keys and any records Argos could not read before continuing.
+            </p>
+            <p>
+              If you have a zcashd Sapling extended spending key instead of a file, paste one or
+              more <code>secret-extended-key-main1…</code> or
+              <code>secret-extended-key-test1…</code> keys, one per line, and check them before
+              continuing. Viewing keys are not accepted because they cannot authorize a sweep.
+            </p>
+
+            <h3>3. Configure</h3>
+            <p>
+              Choose mainnet or testnet, enter a birthday height, and provide a lightwalletd URL.
+              Comma-separated lightwalletd URLs are tried in order as fallbacks. Birthday and
+              account-range controls apply to seed-derived HD recovery; an imported key set is
+              fixed and does not use the HD gap-limit search.
+            </p>
+            <p>
+              Leave auto gap-limit mode on for most recoveries. Use an explicit account count only
+              when you know how many accounts you need to inspect.
+            </p>
+
+            <h3>4. Scan</h3>
+            <p>
+              Argos syncs compact blocks, checks either the derived legacy account layout or the
+              imported keys, and summarizes the covered balances. Seed recovery covers
+              transparent, Sapling, and Orchard. A seedless zcashd import covers its transparent
+              and Sapling keys; Sprout is shown and recovered separately so a partial total cannot
+              be mistaken for the whole wallet. The local workspace lets you resume or repeat a
+              scan without starting from nothing.
+            </p>
+
+            <h3>5. Sweep</h3>
+            <p>
+              Validate the destination Unified Address, review gross value, fee estimates, net
+              value, memo, and skipped accounts. Imported Sapling accounts and transparent UTXOs
+              may produce separate transactions. Broadcasting a sweep is irreversible.
+            </p>
+
+            <h3>6. Complete</h3>
+            <p>
+              Review broadcast and confirmation results. Transactions may remain pending if they
+              were accepted by lightwalletd but not mined before the bounded wait window ends.
+            </p>
+          </section>
+
+          <section id="sprout">
+            <h2>Sprout Recovery</h2>
+            <p>
+              Sprout support is included in normal Argos builds. A ZecWallet Lite seed alone cannot
+              reconstruct Sprout keys, because the legacy wallet generated those independently.
+              Use a zcashd <code>wallet.dat</code> or, with the CLI, an <code>SK…</code> mainnet or
+              <code>ST…</code> testnet spending-key file.
+            </p>
+            <p>
+              After opening a wallet file, Argos first checks whether it already contains spendable
+              note data and a cached witness. If it does, use <strong>Sweep Sprout funds</strong>;
+              no chain scan is required. If it contains keys but no usable note data, Argos offers
+              a resumable full-block scan.
+            </p>
+            <div class="callout">
+              <strong>A Sprout scan is not an ordinary scan.</strong>
+              <span>
+                Compact blocks omit Sprout ciphertexts. Mainnet recovery reads 1,046,400 full
+                blocks from the Zcash P2P network, transfers roughly 26 GB, takes hours, and keeps
+                under 500 MB on disk. Progress is checkpointed so you can stop and resume.
+              </span>
+            </div>
+            <p>
+              That checkpoint is spend-capable: it contains the Sprout spending keys, recovered
+              note plaintexts, and witnesses. Protect it like the original wallet file. Argos
+              removes it after a successful sweep; remove any leftover only after confirming the
+              destination transaction.
+            </p>
+            <p>
+              Sprout funds can only land in Sapling. Argos accepts a bare Sapling address or the
+              Sapling receiver of a Unified Address. A single transaction cannot reach Orchard
+              because Sprout JoinSplits and Orchard actions use different transaction versions.
+              Move the funds from Sapling to Orchard afterward from your destination wallet if you
+              want that second hop.
+            </p>
+          </section>
+
+          <section id="report">
+            <h2>Recovery Report</h2>
+            <p>
+              The complete screen can save a plain-text recovery report. Store it with your own
+              recovery notes. The report is useful for remembering destination addresses, broadcast
+              transaction IDs, skipped accounts, and the workspace path used for the session.
+            </p>
+          </section>
+
+          <section id="troubleshooting">
+            <h2>Troubleshooting</h2>
+            <details open>
+              <summary>The sweep fails but the scan found my funds</summary>
+              <p>
+                Check your Argos version first. Zcash activated the Ironwood network upgrade
+                (NU6.3) at mainnet block <strong>3,428,143</strong>. Versions of Argos before
+                <strong>1.1.0</strong> build sweep transactions the network no longer accepts, so
+                the sweep is rejected.
+              </p>
+              <p>
+                Scanning is unaffected, which is what makes this confusing: your funds are found
+                and displayed normally, and only the final sweep fails. Nothing is lost, and no
+                funds move — the rejected transaction never took effect.
+                <a href="index.html#download">Download the current version</a> and run the
+                recovery again.
+              </p>
+            </details>
+            <details>
+              <summary>The seed validation fails</summary>
+              <p>
+                Count the words, check for typos, and verify that the phrase is the ZecWallet Lite
+                recovery phrase. A valid phrase has exactly 24 BIP-39 words.
+              </p>
+            </details>
+            <details>
+              <summary>The scan is slow</summary>
+              <p>
+                Older birthday heights require more compact-block sync. Use the closest safe wallet
+                creation date you know, keep the workspace folder, and let the app resume.
+              </p>
+            </details>
+            <details>
+              <summary>The server does not connect</summary>
+              <p>
+                Try the recommended preset, switch networks if needed, or enter multiple
+                comma-separated lightwalletd endpoints.
+              </p>
+            </details>
+            <details>
+              <summary>The sweep is skipped for an account</summary>
+              <p>
+                Review the skipped reason in the sweep proposal. Common causes include dust values,
+                fee guard limits, or insufficient spendable balance.
+              </p>
+            </details>
+            <details>
+              <summary>A wallet has Sprout keys but no spendable notes</summary>
+              <p>
+                The keys are intact, but the file lacks the cached note and witness data needed for
+                a direct sweep. Keep the original file and run the full-block Sprout scan. Do not
+                treat the ordinary transparent/Sapling total as the wallet's complete balance.
+              </p>
+            </details>
+          </section>
+
+          <section id="security">
+            <h2>Security Checklist</h2>
+            <ul>
+              <li>Use a computer you control and avoid screen sharing while any recovery secret is visible.</li>
+              <li>Prefer an encrypted disk and encrypted swap (or disable swap); avoid suspend or hibernate while secrets are in memory.</li>
+              <li>Confirm you downloaded Argos from the official release page.</li>
+              <li>Validate the destination Unified Address before sweep review.</li>
+              <li>Set a max fee guard if you want the app to stop above a chosen fee.</li>
+              <li>Keep the original wallet file until every relevant pool has been swept and confirmed.</li>
+              <li>Keep the recovery report, but do not store seeds, passphrases, or spending keys inside it.</li>
+            </ul>
+          </section>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Argos Rescue Wallet</span>
+      <a href="./index.html">Splash Page</a>
+      <a href="./index.html#help">Get help</a>
+      <a href="https://github.com/sovright/argos">Source</a>
+    </footer>
+  </body>
+</html>

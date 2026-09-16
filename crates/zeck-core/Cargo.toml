@@ -1,0 +1,120 @@
+[package]
+name = "argos-core"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+publish = false
+
+[features]
+# `argos-network` — opt-in support for talking to a private "Argos network"
+# (a local zcashd-regtest + lightwalletd stack booted from tests/regtest/).
+# When enabled, `validate_lightwalletd_network` accepts the `regtest` chain
+# name as a synonym for testnet and skips the Sapling-activation-height
+# check, so the C2 integration tests in tests/regtest_integration.rs can
+# scan a deterministic local chain instead of public testnet.
+#
+# Deliberately a dev/test-only escape hatch: production builds compile this
+# out, so a hostile mainnet lightwalletd cannot claim to be `regtest` to
+# bypass network validation in a released Argos binary.
+argos-network = ["zcash_protocol/local-consensus"]
+[dependencies]
+anyhow.workspace = true
+argos-wallet-import = { path = "../argos-wallet-import" }
+async-trait.workspace = true
+bip0039.workspace = true
+keepawake.workspace = true
+orchard.workspace = true
+pczt.workspace = true
+prost.workspace = true
+rand_core.workspace = true
+rusqlite.workspace = true
+sapling-crypto.workspace = true
+rustls.workspace = true
+secp256k1.workspace = true
+bellman.workspace = true
+blake2b_simd.workspace = true
+equihash.workspace = true
+bls12_381.workspace = true
+chacha20poly1305.workspace = true
+ed25519-zebra.workspace = true
+x25519-dalek.workspace = true
+secrecy.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tonic.workspace = true
+tracing.workspace = true
+url.workspace = true
+sha2.workspace = true
+uuid.workspace = true
+zcash_address.workspace = true
+zcash_client_backend.workspace = true
+zcash_client_sqlite.workspace = true
+zcash_keys.workspace = true
+zcash_primitives.workspace = true
+zcash_proofs.workspace = true
+zcash_protocol.workspace = true
+zcash_script.workspace = true
+zcash_transparent.workspace = true
+zip32.workspace = true
+
+[dev-dependencies]
+base64.workspace = true
+tempfile.workspace = true
+# Decoding the zcashd golden export in `zcashd_phrase_matches_zcashd.rs`.
+# The export's keys carry regtest HRPs / version bytes that Argos has no
+# production reason to know, and the point of that test is to compare key
+# *material* rather than encodings — so it decodes the payloads directly.
+# Both are already in the workspace lock as transitives of the `zcash_*`
+# crates; neither is a new download.
+bech32 = "0.11.1"
+bs58 = "0.5.1"
+# `test-util` enables `#[tokio::test(start_paused = true)]` so the stall
+# watchdog unit tests can advance the clock without burning wall-clock.
+tokio = { workspace = true, features = ["test-util"] }
+tokio-stream = { version = "0.1", features = ["net", "sync"] }
+# Required at runtime by the tonic-server code generated for the FakeLightwalletd
+# fixture (see build.rs). Already in the workspace lock as a transitive of
+# zcash_client_backend; not a new download.
+tonic-prost = "0.14"
+
+[build-dependencies]
+# Only invoked when the `argos-network` feature is enabled (see build.rs).
+# Both `tonic-build` and `tonic-prost-build` are already in the workspace
+# lock graph as transitive build-deps of the `zcash_*` crates, so this does
+# not add new downloads.
+tonic-prost-build = "0.14"
+
+# ─── Test-only helper binaries (R-S27, R-S29) ─────────────────────────────────
+#
+# These two binaries exist solely to be spawned as subprocesses by the C2
+# integration tests so the test parent can deliver SIGKILL at a chosen point
+# without the failure mode being in-process task cancellation (which would
+# not exercise the genuine crash-mid-batch behaviour).
+#
+# Built only when `--features argos-network` is active. Tests reach them
+# via `env!("CARGO_BIN_EXE_argos-scan-helper")` / `argos-sweep-helper`.
+# Locations under `tests/` keep them out of the normal `src/bin/` namespace
+# so they don't pollute `cargo install` output for argos-core (which is
+# itself a library; no end-user installs argos-core directly).
+
+[[bin]]
+name = "argos-scan-helper"
+path = "tests/bin/argos_scan_helper.rs"
+required-features = ["argos-network"]
+
+[[bin]]
+name = "argos-sweep-helper"
+path = "tests/bin/argos_sweep_helper.rs"
+required-features = ["argos-network"]
+
+# Replaces zcashd's `sendtoaddress` for funding the test seed: Zebra has no
+# wallet RPCs, and coinbase may not be spent to a transparent address, so
+# funding shields the funder's coinbase straight to the test seed instead.
+[[bin]]
+name = "argos-regtest-funder"
+path = "tests/bin/argos_regtest_funder.rs"
+required-features = ["argos-network"]

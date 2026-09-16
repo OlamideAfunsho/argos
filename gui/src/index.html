@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Argos</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Mandatory Terms of Service gate. Shown on top of everything until the
+         current TOS version is accepted; Reject exits the app. Starts visible
+         so the wizard is never reachable before acceptance is resolved. -->
+    <div class="guide-overlay tos-overlay" id="tos-overlay" role="dialog" aria-modal="true" aria-label="Terms of Service" style="display:flex">
+      <div class="guide-panel tos-panel">
+        <div class="guide-header">
+          <div>
+            <p class="eyebrow">Please review and accept</p>
+            <h2>Argos Terms of Service</h2>
+          </div>
+        </div>
+        <div class="guide-body">
+          <pre class="tos-text" id="tos-text">Loading…</pre>
+        </div>
+        <div class="tos-actions">
+          <button class="ghost" id="tos-reject">Reject &amp; quit</button>
+          <button class="primary" id="tos-accept">Accept</button>
+        </div>
+      </div>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <div>
+            <div class="sidebar-brand">
+              <img src="./zeck-icon.svg" alt="" width="72" height="72" />
+              <h1>Argos</h1>
+            </div>
+            <p class="eyebrow">ZecWallet Lite Recovery</p>
+            <p class="sidebar-copy">
+              Recover your Zcash from ZecWallet Lite and send it safely to your new wallet.
+            </p>
+          </div>
+
+          <ol class="step-list">
+            <li data-step-indicator="welcome">Welcome</li>
+            <li data-step-indicator="seed">Seed Entry</li>
+            <li data-step-indicator="config">Configure</li>
+            <li data-step-indicator="scan">Scan</li>
+            <li data-step-indicator="sweep">Sweep</li>
+            <li data-step-indicator="complete">Complete</li>
+          </ol>
+        </div>
+
+        <div class="sidebar-bottom-actions">
+          <button class="guide-btn donate-btn" id="open-donate" aria-label="Donate to support Argos">♥ Donate</button>
+          <button class="guide-btn" id="open-guide" aria-label="Open user guide">? Help</button>
+          <a class="sidebar-credit" href="https://sovright.com" target="_blank" rel="noreferrer" aria-label="Built by Sovright">
+            <span class="sidebar-credit-prefix">Built by</span>
+            <img class="sidebar-credit-mark" src="./assets/sovright-caption.svg" alt="Sovright" />
+          </a>
+          <!-- Selectable so it can be copied verbatim into a support message. -->
+          <p class="sidebar-version" id="app-version"></p>
+        </div>
+      </aside>
+
+      <div class="sidebar-resize-handle" id="sidebar-resize-handle" title="Drag to resize"></div>
+
+      <!-- Donate Overlay -->
+      <div class="guide-overlay" id="donate-overlay" aria-modal="true" role="dialog" aria-label="Donate to support Argos" style="display:none">
+        <div class="guide-panel">
+          <div class="guide-header">
+            <div>
+              <p class="eyebrow">Support the project</p>
+              <h2>Donate</h2>
+            </div>
+            <button class="guide-close" id="close-donate" aria-label="Close donate panel">✕</button>
+          </div>
+          <div class="guide-body">
+            <div class="guide-section">
+              <h3>Help us keep doing this</h3>
+              <p>This effort was only possible through public donations. If Argos helped you recover your ZEC, Sovright would appreciate a small donation to continue doing work like this.</p>
+            </div>
+            <div class="guide-section">
+              <h3>Send ZEC</h3>
+              <div class="donate-address-block">
+                <code id="donate-address" class="donate-address">Address coming soon</code>
+                <button class="ghost" id="copy-donate-address" disabled>Copy</button>
+              </div>
+              <p id="donate-copy-status" class="status-line" style="margin-top:8px"></p>
+            </div>
+            <div class="guide-section">
+              <h3>Other ways to help</h3>
+              <ul>
+                <li>Share Argos with others who may need to recover a ZecWallet Lite seed</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Guide Overlay -->
+      <div class="guide-overlay" id="guide-overlay" aria-modal="true" role="dialog" aria-label="User Guide" style="display:none">
+        <div class="guide-panel">
+          <div class="guide-header">
+            <div>
+              <p class="eyebrow">Documentation</p>
+              <h2>User Guide</h2>
+            </div>
+            <button class="guide-close" id="close-guide" aria-label="Close guide">✕</button>
+          </div>
+          <div class="guide-body">
+
+            <div class="guide-section">
+              <h3>Get help</h3>
+              <p>Stuck, or have a question? Reach the people who build Argos through any of these channels:</p>
+              <ul>
+                <li><strong>GitHub Discussions</strong> — public Q&amp;A for setup and error messages: <a href="https://github.com/sovright/argos/discussions" target="_blank" rel="noreferrer">github.com/sovright/argos/discussions</a></li>
+                <li><strong>Signal group</strong> — end-to-end encrypted real-time help (your phone number stays private): <a href="https://signal.group/#CjQKIKE0kww-DmAPcnN92JPeSt7_e2YYyLOy11l1up_vHvC1EhDUYW2_t9TDKpeXh7lP2l5Q" target="_blank" rel="noreferrer">join the Signal group</a></li>
+                <li><strong>Email</strong> — private, one-to-one help: <a href="mailto:support@sovright.com">support@sovright.com</a></li>
+              </ul>
+              <img class="guide-qr" src="./assets/signal-qr.png" alt="QR code to join the Argos support group on Signal" width="160" height="160" />
+              <p class="guide-warning"><strong>Argos support will never ask for your seed phrase, wallet file, passphrase, or spending key.</strong> Anyone who does is a scammer. Enter recovery secrets only in this signed app.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>What is Argos?</h3>
+              <p>Argos recovers Zcash from ZecWallet Lite seeds and wallet files, zcashd <code>wallet.dat</code>, and standalone Sapling or Sprout spending keys. It scans the applicable pools and sweeps recoverable funds to a modern wallet like ZODL (formerly Zashi) or YWallet.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Before you start</h3>
+              <ul>
+                <li><strong>Your recovery source:</strong> a 24-word ZecWallet Lite seed, an original wallet file, or a standalone spending-key backup.</li>
+                <li><strong>A destination Unified Address</strong> (starts with <code>u1…</code>) from a modern wallet such as ZODL or YWallet. Transparent (t1…) and Sapling (zs…) addresses are not accepted.</li>
+                <li>A stable internet connection. Long scans can reconnect automatically if the server drops — but don't put your machine to sleep mid-scan.</li>
+              </ul>
+            </div>
+
+            <div class="guide-section">
+              <h3>Step 1 — Welcome</h3>
+              <p>Choose <em>I have my 24-word seed phrase</em> for the ZecWallet Lite HD path, or <em>I have a wallet file</em> to open a ZecWallet Lite/zcashd file or paste a standalone key.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Step 2 — Seed Entry</h3>
+              <p>Paste your full 24-word seed phrase (separated by spaces). Click <em>Validate seed</em> or press Enter — Argos checks the BIP-39 checksum locally. The phrase is blurred by default; toggle <em>Show words on screen</em> if you need to proofread it. Your seed is never transmitted anywhere.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Step 2 — Wallet File or Sapling Key</h3>
+              <p>Choose, drag, or type the path to a ZecWallet Lite wallet or zcashd <code>wallet.dat</code>. Argos opens it read-only. If encrypted, enter the passphrase in the app; it is used in memory and never written to disk. Review the key counts and any unread-record diagnostics before continuing.</p>
+              <p>If you have no wallet file, paste one or more <code>secret-extended-key-main1…</code> or <code>secret-extended-key-test1…</code> Sapling spending keys and click <em>Check keys</em>. Viewing keys cannot authorize a sweep and are rejected.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Step 3 — Configure</h3>
+              <ul>
+                <li><strong>Network:</strong> Use Mainnet unless you were testing with play money.</li>
+                <li><strong>Wallet birthday:</strong> The block number when your wallet was created. An earlier birthday is safe but means a longer scan. Use <em>Estimate from date</em> to convert a calendar date, or <em>Auto-detect</em> to probe the blockchain automatically.</li>
+                <li><strong>Accounts to scan:</strong> Most users had just one account. Leaving this at 20 is safe for nearly everyone.</li>
+                <li><strong>Destination address:</strong> Paste your <code>u1…</code> Unified Address here. Click <em>Validate destination</em> to confirm it has an Orchard or Sapling receiver.</li>
+                <li><strong>Server:</strong> Leave on <em>Recommended</em> unless you run your own lightwalletd node.</li>
+              </ul>
+              <p>When you're happy with the settings, click <em>Start Scan</em>.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Step 4 — Scan</h3>
+              <p>Argos first probes transparent UTXOs (results appear within seconds), then syncs all shielded compact blocks. Seed recovery covers transparent, Sapling, and Orchard; a seedless imported wallet covers its transparent and Sapling keys. Sprout is recovered separately so an ordinary total is never presented as the whole wallet.</p>
+              <p class="guide-tip">Scans can take anywhere from a few minutes (recent birthday) to several hours (birthday near Sapling activation in 2018). The ETA warms up after about 15 seconds.</p>
+              <p>You can cancel and resume at any time. Re-run Argos with the same seed, network, birthday, and account settings to pick up from the last saved block.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Step 5 — Sweep</h3>
+              <p>Review the proposed transactions before anything is broadcast. The table shows each account, destination, gross amount, fee, and net received. Imported Sapling accounts and transparent UTXOs may produce separate transactions.</p>
+              <p>Check the <em>irreversible</em> acknowledgement box, then click <em>Sweep Funds</em>. Transactions are broadcast to the Zcash network — this cannot be undone.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Sprout Recovery</h3>
+              <p>Sprout support is included in Argos. A ZecWallet Lite seed alone cannot recreate these independently generated keys; use a zcashd <code>wallet.dat</code> or standalone <code>SK…</code>/<code>ST…</code> key.</p>
+              <p>If the wallet file contains cached note data and a witness, Argos can sweep it immediately. Otherwise recovery needs a resumable full-block scan from genesis to Canopy. On mainnet that is 1,046,400 blocks, roughly 26 GB transferred, under 500 MB retained, and hours of work.</p>
+              <p>Sprout funds land in a Sapling receiver, even when you provide a Unified Address. They cannot reach Orchard in the same transaction; move them from Sapling to Orchard afterward from your own wallet if desired. Keep the original file and the private scan checkpoint until every transaction is confirmed.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Step 6 — Complete</h3>
+              <p>Argos shows the txid for each transaction. Save a recovery report to a text file for your records.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Troubleshooting</h3>
+              <ul>
+                <li><strong>Seed validation fails:</strong> Check for typos, extra spaces, or missing words. All 24 words must be valid BIP-39 words in the correct order.</li>
+                <li><strong>Auto-detect finds no birthday:</strong> Your wallet may have no transparent history. Use the date picker to estimate the birthday manually instead.</li>
+                <li><strong>Scan seems stuck:</strong> Long pauses during the shielded sync are normal — the server may be catching up. Watch the block counter; as long as it's moving, the scan is working.</li>
+                <li><strong>Connection drops:</strong> Argos reconnects automatically up to 10 times. If it keeps failing, try switching the server preset to use a different public node.</li>
+                <li><strong>No funds found:</strong> Confirm you used the correct network (Mainnet vs Testnet) and that the birthday is early enough to cover when you first received ZEC.</li>
+                <li><strong>Sweep fails:</strong> The workspace may be out of date. Go back to config and re-run the scan with the same settings to refresh it, then try sweeping again.</li>
+              </ul>
+            </div>
+
+            <div class="guide-section">
+              <h3>Security</h3>
+              <p>Argos is built to keep the JavaScript surface as small as possible:</p>
+              <ul>
+                <li><strong>No npm packages run in the browser.</strong> <code>window.__TAURI__</code> is injected by the Rust host via <code>withGlobalTauri</code> — <code>main.js</code> imports nothing from node_modules.</li>
+                <li><strong>No frontend framework.</strong> No React, Vue, Svelte, router, state library, UI kit, or analytics.</li>
+                <li><strong>Rescue-only workflow.</strong> The GUI is not an everyday wallet — it does one thing (validate, scan, sweep) and exits. There is no persistent session or background process.</li>
+                <li><strong>Key operations happen in Rust.</strong> Derivation, wallet parsing, scanning, and transaction building run in Rust behind explicit Tauri commands. JavaScript drives the UI and transiently holds values the user enters.</li>
+                <li><strong>Protect local secret state.</strong> Use an encrypted disk and encrypted swap (or disable swap), avoid suspend/hibernate during recovery, and treat a Sprout checkpoint like the original spending key.</li>
+              </ul>
+              <p>Independently audited by <a href="https://leastauthority.com" target="_blank" rel="noopener">Least Authority</a>.</p>
+            </div>
+
+            <div class="guide-section">
+              <h3>Frequently asked questions</h3>
+              <ul>
+                <li><strong>Are my recovery secrets transmitted?</strong> No. Seeds, wallet passphrases, and spending keys stay local. Ordinary scans download compact blocks from lightwalletd; Sprout scans download public full blocks from Zcash P2P peers.</li>
+                <li><strong>Can I use a transparent or Sapling address as my destination?</strong> Ordinary recovery requires a Unified Address with an Orchard or Sapling receiver. The separate Sprout sweep also accepts a bare Sapling address because Sprout can only land in Sapling.</li>
+                <li><strong>What if I had more than one ZecWallet Lite account?</strong> Argos scans up to 500 accounts automatically. If you enabled the gap-limit scan mode, it stops after 20 consecutive empty accounts by default — enough for almost all wallets.</li>
+                <li><strong>What happens to my data after Argos finishes?</strong> The ordinary workspace stays in the chosen data directory. A Sprout scan checkpoint is spend-capable and remains so the scan can resume; Argos removes it after a successful sweep. Delete remaining recovery state only after confirming the funds arrived.</li>
+                <li><strong>Can I run Argos offline?</strong> Source validation and key derivation are offline, but scanning requires a network connection: lightwalletd for ordinary recovery or Zcash P2P peers for Sprout.</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <main class="main-panel">
+        <section class="screen active" data-step="welcome">
+          <p class="eyebrow">Step 1</p>
+          <h2>Recover your wallet in a few steps</h2>
+          <p class="lead">
+            Start from a ZecWallet Lite seed, a legacy wallet file, or a standalone spending key. Argos will find recoverable funds and walk you through sending them to your new wallet.
+          </p>
+          <div class="card-grid">
+            <article class="info-card">
+              <h3>Use the backup you have</h3>
+              <p>Recover from a 24-word seed, a wallet file, or a standalone Sapling or Sprout spending key.</p>
+            </article>
+            <article class="info-card">
+              <h3>Privacy first</h3>
+              <p>Everything happens on your computer. Your seed phrase is never sent anywhere.</p>
+            </article>
+            <article class="info-card">
+              <h3>Pick up where you left off</h3>
+              <p>If the scan is interrupted, Argos saves your progress so you don't have to start over.</p>
+            </article>
+          </div>
+          <div class="actions">
+            <button class="primary" data-next="seed">I have my 24-word seed phrase</button>
+            <button class="secondary" data-next="wallet-file">I have a wallet file</button>
+          </div>
+          <p class="audit-notice">Independently audited by <a href="https://leastauthority.com" target="_blank" rel="noopener">Least Authority</a>.</p>
+
+          <div id="resume-panel" class="report-card" hidden>
+            <h3>Resume an unfinished scan</h3>
+            <p class="lead">
+              Argos found scans on this computer that didn't finish. Pick one to continue, or start a
+              brand-new scan above.
+            </p>
+            <ul id="resume-sessions" class="session-list"></ul>
+          </div>
+        </section>
+
+        <section class="screen" data-step="wallet-file">
+          <p class="eyebrow">Step 2</p>
+          <h2>Open a wallet file</h2>
+          <p class="lead">
+            A zcashd <code>wallet.dat</code> or a ZecWallet Lite wallet. Argos only reads it — the
+            file is never modified, and nothing is sent anywhere.
+          </p>
+
+          <div id="wallet-drop" class="drop-zone">
+            <p><strong>Drag the wallet file here</strong></p>
+            <p class="muted">or</p>
+            <button class="ghost" id="wallet-browse" type="button">Choose file…</button>
+            <p class="muted">You can also paste its full path below.</p>
+          </div>
+
+          <label class="field">
+            <span>Wallet file path</span>
+            <input id="wallet-path" type="text" autocomplete="off" spellcheck="false" />
+          </label>
+
+          <label class="field" id="wallet-passphrase-field" hidden>
+            <span>Wallet passphrase</span>
+            <input id="wallet-passphrase" type="password" autocomplete="off" />
+            <small>
+              This wallet is encrypted. The passphrase is used to decrypt it in memory and is never
+              written to disk.
+            </small>
+          </label>
+
+          <div class="inline-actions">
+            <button class="ghost" id="wallet-open">Open wallet file</button>
+          </div>
+          <p id="wallet-status" class="status-line"></p>
+
+          <!-- A key with no wallet file behind it: from z_exportkey, from
+               zcashd-wallet-tool, or from a paper backup. Always visible,
+               not gated on a wallet file, because the user who needs it has
+               no wallet file at all. -->
+          <div id="sapling-key-panel">
+            <hr />
+            <p><strong>Or paste a Sapling spending key</strong></p>
+            <label for="sapling-scan-keys">
+              Sapling spending keys (one per line,
+              <code>secret-extended-key-main1…</code>)
+            </label>
+            <textarea id="sapling-scan-keys" rows="3" spellcheck="false"
+              placeholder="Leave blank if you opened a wallet file above"></textarea>
+            <button id="sapling-keys-check" type="button">Check keys</button>
+            <ul id="sapling-key-addresses" class="session-list"></ul>
+            <p id="sapling-key-status" class="status-line"></p>
+          </div>
+
+          <div id="wallet-summary" class="report-card" hidden>
+            <h3>What Argos found</h3>
+            <ul id="wallet-summary-list" class="session-list"></ul>
+            <div id="wallet-sprout-warning" class="guide-warning" hidden>
+              <strong id="wallet-sprout-headline"></strong>
+              <span id="wallet-sprout-detail"></span>
+              <div id="wallet-sprout-scan-cost" hidden></div>
+
+              <!-- Shown only when the wallet file yielded no spendable notes,
+                   which is the one case a scan can help with. Also accepts a
+                   raw key, for a user who has no wallet file at all. -->
+              <div id="sprout-scan-panel" hidden>
+                <hr />
+                <p><strong>Scan the chain for these notes</strong></p>
+                <label for="sprout-scan-keys">
+                  Sprout spending keys (one per line, <code>SK…</code> or <code>ST…</code>)
+                </label>
+                <textarea id="sprout-scan-keys" rows="3" spellcheck="false"
+                  placeholder="Leave blank to use the Sprout keys already in your wallet file"></textarea>
+                <button id="sprout-scan-check" type="button">Check keys</button>
+                <ul id="sprout-scan-addresses" class="session-list"></ul>
+                <button id="sprout-scan-run" type="button">Start scan</button>
+                <p id="sprout-scan-status" class="status-line"></p>
+                <progress id="sprout-scan-bar" value="0" max="100" hidden></progress>
+
+                <!-- Revealed only once a scan has actually found notes. A
+                     scan that finds money and offers nothing to click is
+                     six hours spent to be shown funds you still cannot
+                     reach. -->
+                <div id="sprout-scan-sweep" hidden>
+                  <hr />
+                  <p><strong>Move the funds this scan found</strong></p>
+                  <label for="sprout-scan-destination">Destination address</label>
+                  <input
+                    id="sprout-scan-destination"
+                    type="text"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="zs1… or a Unified Address with a Sapling receiver"
+                  />
+                  <label class="checkbox-row">
+                    <input type="checkbox" id="sprout-scan-confirm" />
+                    I understand this moves funds and cannot be undone.
+                  </label>
+                  <button id="sprout-scan-sweep-run" type="button">Sweep found funds</button>
+                  <ul id="sprout-scan-sweep-results" class="session-list"></ul>
+                </div>
+              </div>
+
+              <!-- Only shown when the wallet file itself yielded spendable
+                   notes. Sprout value must land on a Sapling receiver: it
+                   leaves the pool through the transparent pool and has to be
+                   consumed by a Sapling output in the same transaction. -->
+              <div id="wallet-sprout-sweep" hidden>
+                <hr />
+                <p><strong>Move these funds now</strong></p>
+                <p class="muted">
+                  No scan is needed — the note data is in this file. The destination must
+                  have a Sapling receiver.
+                </p>
+                <label for="sprout-destination">Destination address</label>
+                <input
+                  id="sprout-destination"
+                  type="text"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="zs1… or a Unified Address with a Sapling receiver"
+                />
+                <p id="sprout-sweep-plan" class="muted"></p>
+                <p id="sprout-sweep-pool" class="muted"></p>
+                <p id="sprout-sweep-params" class="muted"></p>
+                <button id="sprout-sweep-run" type="button" disabled>
+                  Sweep Sprout funds
+                </button>
+                <p id="sprout-sweep-status" class="status-line"></p>
+                <ul id="sprout-sweep-results" class="session-list"></ul>
+              </div>
+            </div>
+            <div id="wallet-diagnostics" class="guide-warning" hidden>
+              <strong>Some records could not be read.</strong>
+              <ul id="wallet-diagnostics-list"></ul>
+              Any key material in those records still exists only in the original file.
+            </div>
+          </div>
+
+          <div class="actions split">
+            <button class="secondary" data-prev="welcome">Back</button>
+            <button class="primary" data-next="config" id="wallet-next" disabled>Continue</button>
+          </div>
+        </section>
+
+        <section class="screen" data-step="seed">
+          <p class="eyebrow">Step 2</p>
+          <h2>Enter the seed phrase</h2>
+          <p class="lead">
+            Paste the full 24 words. The phrase stays on this machine and is cleared from the UI
+            after you start a session.
+          </p>
+          <label class="field">
+            <span>Seed phrase</span>
+            <textarea
+              id="seed-input"
+              rows="5"
+              class="masked"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+            ></textarea>
+          </label>
+          <div class="inline-actions">
+            <label class="checkline">
+              <input type="checkbox" id="seed-visibility" />
+              <span>Show words on screen</span>
+            </label>
+            <button class="ghost" id="seed-validate">Validate seed</button>
+            <button class="ghost" id="seed-clear-clipboard" type="button" title="Overwrite the OS clipboard with empty text. Does not clear clipboard-history apps.">Clear clipboard</button>
+          </div>
+          <p id="seed-status" class="status-line"></p>
+          <div class="actions split">
+            <button class="secondary" data-prev="welcome">Back</button>
+            <button class="primary" data-next="config" id="seed-next" disabled>Continue</button>
+          </div>
+        </section>
+
+        <section class="screen" data-step="config">
+          <p class="eyebrow">Step 3</p>
+          <h2>Configure the recovery session</h2>
+          <div class="form-grid">
+
+            <p class="form-section-heading span-two">Scan identity</p>
+
+            <label class="field span-two">
+              <span>Label for this scan</span>
+              <input id="scan-label" type="text" maxlength="120" placeholder="" />
+              <small>A short note to help you tell this scan apart from others on the resume screen later. Defaults to today's date.</small>
+            </label>
+            <label class="field">
+              <span>Network</span>
+              <select id="network-select">
+                <option value="mainnet" selected>Mainnet</option>
+                <option value="testnet">Testnet</option>
+              </select>
+              <small>Use Mainnet unless you were testing with play money (testnet).</small>
+            </label>
+
+            <p class="form-section-heading span-two">Wallet birthday</p>
+
+            <label class="field span-two">
+              <span>Birthday block height</span>
+              <input id="birthday-height" type="number" min="0" value="419200" />
+              <small>The block number when your wallet was created. The scan begins here — an earlier birthday means a longer scan but won't miss funds.</small>
+              <small id="birthday-scan-estimate" style="font-weight:600"></small>
+            </label>
+            <label class="field span-two">
+              <span>Don't know your birthday? Estimate it from a date</span>
+              <input id="birthday-date" type="date" />
+              <div class="inline-actions">
+                <button class="ghost" id="birthday-estimate">Estimate from this date</button>
+                <button class="ghost" id="birthday-autodetect">Auto-detect from blockchain</button>
+              </div>
+              <small id="birthday-probe-status" class="status-line"></small>
+              <small>Pick roughly when you first created your ZecWallet Lite — Argos will fill in the block height for you. <strong>Auto-detect</strong> probes the blockchain using your seed phrase (requires a server connection).</small>
+            </label>
+
+            <p class="form-section-heading span-two">Accounts to scan</p>
+
+            <label class="field">
+              <span>Starting number of accounts</span>
+              <input id="accounts-range" type="range" min="1" max="500" value="20" />
+              <strong id="accounts-range-value">20</strong>
+              <small>Most users only ever had 1 account. Leave at 20 to be safe. With gap scanning enabled, Argos may check additional accounts beyond this number.</small>
+            </label>
+            <label class="checkline field">
+              <input id="auto-gap-limit" type="checkbox" checked />
+              <span>Keep scanning until no more funds are found <em>(recommended)</em></span>
+            </label>
+            <div id="gap-limit-row" class="field" style="display:none">
+              <label class="field">
+                <span>Stop after this many consecutive empty accounts</span>
+                <input id="gap-limit" type="number" min="1" max="50" value="20" />
+                <small>Only change this if you know you had many unused accounts. Default of 20 is fine for almost everyone.</small>
+              </label>
+            </div>
+
+            <p class="form-section-heading span-two">Server</p>
+
+            <label class="field">
+              <span>Server preset</span>
+              <select id="server-preset">
+                <option value="recommended" selected>Recommended for selected network</option>
+                <option value="mainnet">Mainnet public server</option>
+                <option value="testnet">Testnet public server</option>
+                <option value="custom">Use current server</option>
+              </select>
+              <small>Leave on "Recommended" unless you have your own server.</small>
+            </label>
+            <label class="field span-two">
+              <span>Zcash node address (lightwalletd)</span>
+              <input
+                id="lightwalletd-url"
+                type="text"
+                value="https://zec.rocks:443,https://na.zec.rocks:443"
+              />
+              <small>The server Argos connects to for blockchain data. Auto-filled by the preset above. You can add backup servers separated by commas.</small>
+            </label>
+            <label class="field span-two">
+              <span>Where to save scan data on this computer</span>
+              <input id="data-dir" type="text" placeholder="platform default populated on load" />
+              <small>Argos saves its progress here so a scan can be resumed if interrupted. Change this to a permanent folder if you want to keep the data after a reboot.</small>
+            </label>
+
+            <p class="form-section-heading span-two">Destination &amp; sweep options</p>
+
+            <label class="field span-two">
+              <span>Destination address — where to send your recovered ZEC</span>
+              <input id="destination-input" type="text" placeholder="u1..." />
+              <small>Must be a Unified Address starting with "u1" from your new wallet (e.g. ZODL or YWallet). Transparent (t1…) and Sapling (zs…) addresses are not accepted.</small>
+            </label>
+            <label class="field span-two">
+              <span>Recovery memo (optional)</span>
+              <input id="sweep-memo" type="text" placeholder="ZEC recovery" />
+              <small>A short note attached to the recovery transaction. Visible only to the sender and recipient. <span id="memo-byte-count"></span></small>
+            </label>
+            <label class="field">
+              <span>Max transaction fee in ZEC (optional)</span>
+              <input id="max-fee-zec" type="text" inputmode="decimal" placeholder="0.0002" />
+              <small>Leave blank to use the standard fee (~0.0002 ZEC). Only change this if you know what you're doing.</small>
+            </label>
+          </div>
+          <div class="inline-actions">
+            <button class="ghost" id="destination-validate">Validate destination</button>
+          </div>
+          <p id="config-status" class="status-line"></p>
+          <div class="actions split">
+            <button class="secondary" data-prev="seed">Back</button>
+            <button class="primary" id="start-scan">Start Scan</button>
+          </div>
+        </section>
+
+        <section class="screen" data-step="scan">
+          <p class="eyebrow">Step 4</p>
+          <h2>Recovery scan</h2>
+          <div class="banner warning" id="scan-warning">
+            Transparent funds are detected within seconds. Argos must still finish the full
+            shielded block sync before sweeping — <strong>Review &amp; Sweep unlocks when the
+            phase reads "Complete".</strong>
+          </div>
+          <div class="banner info" id="scan-resume-info">
+            <strong>Safe to interrupt.</strong> Progress is saved automatically — quit Argos or
+            cancel the scan at any time, then re-run with the same data directory, network,
+            birthday, and account-scan settings (the same gap limit, or the same explicit
+            account count) to resume from the last persisted block. Changing any of those
+            intentionally starts a fresh scan from the new birthday.
+          </div>
+          <div class="banner warning" id="scan-sleep-banner" style="display:none">
+            <strong>This machine went to sleep during the scan.</strong>
+            <span id="scan-sleep-detail"></span>
+            Argos reconnected automatically and your scan progress was preserved on disk.
+            For faster sync, adjust your system settings to keep the computer awake while Argos is running.
+          </div>
+          <div class="banner info" id="scan-sandblasting-banner" style="display:none">
+            <strong>🐢 Slow zone — sandblasting era (mid-2022 → late&nbsp;2023, mainnet).</strong>
+            Block volume during this window was inflated by a sustained
+            <a href="https://www.theblock.co/post/175259/someone-is-clogging-up-the-zcash-blockchain-with-a-spam-attack"
+               target="_blank" rel="noopener noreferrer">spam attack on Zcash</a>.
+            Sync time inside this range can stretch to several days for old wallets.
+            As long as the block counter is moving, your scan is working as designed.
+          </div>
+          <div class="banner info" id="scan-gap-extension-banner" style="display:none">
+            <strong>🔍 Extending the search — this is progress, not a restart.</strong>
+            <span id="scan-gap-extension-detail"></span>
+            ZecWallet&nbsp;Lite spread funds across many accounts, so finding money
+            near the edge of the searched range means there may be more beyond it.
+            Argos is rescanning the chain for the new accounts, which is why the
+            block counter started over. Your earlier findings are safe.
+          </div>
+          <div class="metric-panel">
+            <div>
+              <span class="metric-label">Phase</span>
+              <strong id="scan-phase">Idle</strong>
+            </div>
+            <div>
+              <span class="metric-label">Server</span>
+              <strong id="scan-server">Not connected</strong>
+            </div>
+            <div>
+              <span class="metric-label">Progress</span>
+              <strong id="scan-progress-text">0 / 0</strong>
+            </div>
+            <div>
+              <span class="metric-label">Time remaining</span>
+              <strong id="scan-eta">Estimating remaining time…</strong>
+            </div>
+          </div>
+          <div class="progress-shell">
+            <div class="progress-bar" id="scan-progress-bar"></div>
+          </div>
+          <p id="scan-message" class="status-line"></p>
+          <div class="report-card scan-summary-card">
+            <p id="scan-totals" class="status-line">Grand total: 0.00000000 ZEC across 0 accounts.</p>
+            <!-- The total above counts only the pools this scan covers. A
+                 wallet file's Sprout keys are not among them, and the CLI
+                 says so loudly at this exact moment; the GUI used to stay
+                 silent, so a user could read a Sprout-excluding total as
+                 their whole balance. -->
+            <div id="scan-sprout-uncovered" class="guide-warning" hidden></div>
+            <p id="scan-workspace" class="status-line">Workspace: not initialized</p>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Acct</th>
+                  <th>Sapling</th>
+                  <th>Orchard</th>
+                  <th>Transparent</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="scan-rows"></tbody>
+            </table>
+          </div>
+          <div class="report-card" id="scan-discoveries" style="display:none"></div>
+          <div class="actions split">
+            <button class="secondary" id="cancel-scan">Cancel</button>
+            <button class="ghost" id="back-to-config" style="display:none">← Back to config</button>
+            <button class="primary" id="review-sweep" disabled>Review & Sweep</button>
+          </div>
+        </section>
+
+        <section class="screen" data-step="sweep">
+          <p class="eyebrow">Step 5</p>
+          <h2>Review the sweep proposal</h2>
+          <div class="banner warning">
+            Argos will broadcast real transactions from the persisted recovery workspace. Any
+            transparent funds are shielded first, then the account's spendable shielded value is
+            swept to your destination Unified Address.
+          </div>
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th>Step</th>
+                  <th>Destination</th>
+                  <th>Gross</th>
+                  <th>Fee</th>
+                  <th>Net</th>
+                  <th>Donation</th>
+                  <th>Memo</th>
+                </tr>
+              </thead>
+              <tbody id="sweep-rows"></tbody>
+            </table>
+          </div>
+          <p id="sweep-summary" class="status-line"></p>
+          <div class="report-card" id="sweep-skipped"></div>
+          <div class="donate-form report-card" id="donate-form">
+            <p class="donate-eyebrow">Support Argos</p>
+            <h3 class="donate-heading">Help us keep doing this</h3>
+            <p class="donate-story">
+              This effort was only possible through public donations. If Argos
+              helped you recover your ZEC, Sovright would appreciate a small
+              donation to continue doing work like this.
+            </p>
+            <!-- Source of truth for on/off; toggled by the chips/skip link, not shown directly. -->
+            <input type="checkbox" id="donate-enabled" checked hidden />
+            <div class="preset-row" id="donate-presets" role="group" aria-label="Donation amount">
+              <button type="button" class="preset-chip" data-pct="5" aria-pressed="false">
+                <span class="preset-pct">5%</span><span class="preset-amt"></span>
+              </button>
+              <button type="button" class="preset-chip" data-pct="10" aria-pressed="true">
+                <span class="preset-pct">10%</span><span class="preset-amt"></span>
+              </button>
+              <button type="button" class="preset-chip" data-pct="20" aria-pressed="false">
+                <span class="preset-pct">20%</span><span class="preset-amt"></span>
+              </button>
+              <button type="button" class="preset-chip" data-pct="custom" aria-pressed="false">
+                <span class="preset-pct">Custom</span><span class="preset-amt">%</span>
+              </button>
+            </div>
+            <div class="donate-fields" id="donate-fields" hidden>
+              <label class="field">
+                <span>Donation percentage</span>
+                <input id="donate-rate" type="number" min="0" max="99" step="1" value="10" />
+              </label>
+            </div>
+            <label class="field" id="donate-email-field">
+              <span>Email for receipt (optional)</span>
+              <input id="donate-email" type="email" placeholder="you@example.com" />
+            </label>
+            <p class="status-line" id="donate-amount-preview" style="margin-top:8px"></p>
+            <button type="button" class="donate-skip" id="donate-skip">No thanks, skip donation</button>
+          </div>
+          <label class="checkline">
+            <input type="checkbox" id="irreversible-check" />
+            <span>I understand that broadcasting this recovery sweep is irreversible.</span>
+          </label>
+          <p id="sweep-execute-status" class="status-line"></p>
+          <div class="actions split">
+            <button class="secondary" id="sweep-back">Back</button>
+            <button class="primary" id="execute-sweep" disabled>Sweep Funds</button>
+          </div>
+        </section>
+
+        <section class="screen" data-step="complete">
+          <p class="eyebrow">Step 6</p>
+          <h2>Recovery complete</h2>
+          <p class="lead" id="complete-summary">Transactions broadcast successfully.</p>
+          <!-- Repeated here deliberately: this screen is where the "Delete
+               workspace" button lives, and the wallet file is the only copy
+               of any Sprout key it holds. -->
+          <div id="complete-sprout-uncovered" class="guide-warning" hidden></div>
+          <div id="complete-txids" class="complete-txids"></div>
+          <p id="complete-donation" hidden></p>
+          <div class="report-card" id="complete-skipped"></div>
+          <!-- Audit Issue B: confirmation is attested by the single connected
+               lightwalletd server, so this advises independent verification. -->
+          <p class="status-line" id="complete-confirmation-note">
+            Confirmation status is reported by the lightwalletd server you connected to. Before treating your recovery as final, verify each transaction ID on an independent Zcash block explorer or a second node.
+          </p>
+          <div class="report-card" id="complete-report" style="display:none"></div>
+          <div class="donate-card report-card">
+            <h3>Help us keep doing this</h3>
+            <p>This effort was only possible through public donations. If Argos helped you recover your ZEC, Sovright would appreciate a small donation to continue doing work like this.</p>
+            <button class="ghost" id="complete-open-donate">Donate</button>
+          </div>
+          <label class="field">
+            <span>Recovery report path</span>
+            <input id="report-path" type="text" value="argos-recovery-report.txt" />
+            <small class="hint">Saved inside the recovery workspace. Subdirectories are created if needed.</small>
+          </label>
+          <div class="inline-actions">
+            <button class="ghost" id="save-report">Save recovery report</button>
+            <button class="ghost" id="copy-report-path" style="display:none">Copy path</button>
+            <p id="save-report-status" class="status-line"></p>
+          </div>
+          <div class="danger-zone" id="delete-workspace-zone">
+            <h3>Delete workspace</h3>
+            <p class="hint">
+              Once you have verified the swept funds in your destination wallet and saved the
+              recovery report somewhere safe, you can delete the on-disk recovery workspace.
+              It contains the full viewing keys and decrypted note cache for the scanned seed
+              — anyone with read access to your account can reconstruct your transaction
+              history from it. Spending still requires the seed phrase.
+            </p>
+            <p class="hint">
+              <strong>Note:</strong> on modern SSDs, file deletion is not a cryptographic
+              wipe. The OS marks the blocks free but the data may persist on the drive
+              until the cells are overwritten or TRIM'd. For high-value seeds, consider
+              encrypting the volume Argos writes to.
+            </p>
+            <div id="delete-sprout-uncovered" class="guide-warning" hidden></div>
+            <div class="inline-actions">
+              <button class="danger" id="delete-workspace">Delete workspace…</button>
+              <p id="delete-workspace-status" class="status-line"></p>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="primary" data-next="welcome" id="restart-flow">Start over</button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="resume-modal" class="modal-overlay" hidden>
+      <div class="modal-card">
+        <p class="eyebrow">Resume scan</p>
+        <h2 id="resume-modal-title">Resume scan</h2>
+        <p class="lead">
+          Enter the 24-word seed phrase that this scan was started with. Argos verifies it matches
+          before unlocking the saved scan data.
+        </p>
+        <label class="field">
+          <span>Seed phrase</span>
+          <textarea id="resume-seed-input" rows="4" class="masked"></textarea>
+        </label>
+        <div class="inline-actions">
+          <label class="checkline">
+            <input type="checkbox" id="resume-seed-visibility" />
+            <span>Show words on screen</span>
+          </label>
+          <button class="ghost" id="resume-seed-clear-clipboard" type="button" title="Overwrite the OS clipboard with empty text. Does not clear clipboard-history apps.">Clear clipboard</button>
+        </div>
+        <label class="field">
+          <span>Label (optional rename)</span>
+          <input id="resume-label-input" type="text" maxlength="120" />
+          <small>Leave blank to keep the existing label.</small>
+        </label>
+        <p id="resume-modal-status" class="status-line"></p>
+        <div class="actions split">
+          <button class="secondary" id="resume-cancel">Cancel</button>
+          <button class="primary" id="resume-confirm">Resume scan</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./main.js"></script>
+  </body>
+</html>

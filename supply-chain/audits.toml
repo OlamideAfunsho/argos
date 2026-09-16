@@ -1,0 +1,312 @@
+
+# cargo-vet audits file
+
+[[audits.chacha20]]
+who = "Zaki Manian <zaki@iqlusion.io>"
+criteria = "safe-to-deploy"
+delta = "0.10.0 -> 0.10.2"
+notes = """
+Delta review of the 0.10.0 -> 0.10.2 diff, performed with Claude Code.
+
+The release fixes an SSE4.1 intrinsic (_mm_extract_epi32) being called from a function declared target_feature(enable = "sse2"), which would execute an illegal instruction on a CPU with SSE2 and no SSE4.1. It is replaced by _mm_storeu_si128, and the counter save/load is factored into Backend::new / Backend::save_ctr. Equivalent behaviour, genuinely SSE2-only.
+
+Rest of the diff: rng.rs corrects a doc typo and replaces a hardcoded 16 with BLOCK_WORDS (same value); chacha.rs narrows a pub use to use; lib.rs moves crate docs to the README. No functional change in any of them.
+
+The NEON backend is rewritten from 4-block to 8-block outer batches, following OpenSSL's ChaCha20_512_neon. This is keystream-generating code and was not accepted on inspection alone: chacha20 0.10.2's own test suite, including the RFC true-value vectors and the RNG output vectors, was run and passes on aarch64-apple-darwin, where the NEON path is the one that executes.
+
+No changes to key or nonce handling, counter semantics, or the round function."""
+
+[[trusted.bellman]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2021-06-04"
+end = "2027-06-26"
+
+[[trusted.bls12_381]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2021-06-03"
+end = "2027-06-26"
+
+[[trusted.corez]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2026-04-17"
+end = "2027-06-26"
+
+[[trusted.equihash]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2020-06-26"
+end = "2027-06-26"
+
+[[trusted.equihash]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2025-02-21"
+end = "2027-06-26"
+
+[[trusted.f4jumble]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2021-09-22"
+end = "2027-06-26"
+
+[[trusted.ff]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2021-08-11"
+end = "2027-06-26"
+
+[[trusted.fpe]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2019-07-22"
+end = "2027-06-26"
+
+[[trusted.group]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2022-10-13"
+end = "2027-06-26"
+
+[[trusted.halo2_gadgets]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2022-02-15"
+end = "2027-06-23"
+
+[[trusted.halo2_legacy_pdqsort]]
+criteria = "safe-to-deploy"
+user-id = 199950 # Daira-Emma Hopwood (daira)
+start = "2023-02-24"
+end = "2027-06-26"
+
+[[trusted.halo2_poseidon]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2024-12-13"
+end = "2027-06-26"
+
+[[trusted.halo2_proofs]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2022-01-20"
+end = "2027-06-26"
+
+[[trusted.incrementalmerkletree]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2021-12-17"
+end = "2027-06-26"
+
+[[trusted.incrementalmerkletree]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2023-02-28"
+end = "2027-06-26"
+
+[[trusted.jubjub]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2021-06-03"
+end = "2027-06-26"
+
+[[trusted.memuse]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2021-09-03"
+end = "2027-06-26"
+
+[[trusted.orchard]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-08-12"
+end = "2027-06-23"
+
+[[trusted.pairing]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2022-12-06"
+end = "2027-06-26"
+
+[[trusted.pasta_curves]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2021-03-03"
+end = "2027-06-26"
+
+[[trusted.reddsa]]
+criteria = "safe-to-deploy"
+user-id = 159631 # Conrado (conradoplg)
+start = "2023-03-09"
+end = "2027-06-26"
+
+[[trusted.redjubjub]]
+criteria = "safe-to-deploy"
+user-id = 159631 # Conrado (conradoplg)
+start = "2025-02-18"
+end = "2027-06-26"
+
+[[trusted.ring]]
+criteria = "safe-to-deploy"
+user-id = 2342 # Brian Smith (briansmith)
+start = "2019-07-03"
+end = "2027-06-23"
+
+[[trusted.rustls]]
+criteria = "safe-to-deploy"
+user-id = 209038 # Daniel McCarney (cpu)
+start = "2023-07-05"
+end = "2027-06-23"
+
+[[trusted.sapling-crypto]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-08-12"
+end = "2027-06-23"
+
+[[trusted.schemerz]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2024-10-15"
+end = "2027-06-26"
+
+[[trusted.schemerz-rusqlite]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2024-10-15"
+end = "2027-06-26"
+
+[[trusted.secp256k1]]
+criteria = "safe-to-deploy"
+user-id = 1588 # Andrew Poelstra (apoelstra)
+start = "2019-05-21"
+end = "2027-06-23"
+
+[[trusted.secp256k1-sys]]
+criteria = "safe-to-deploy"
+user-id = 1588 # Andrew Poelstra (apoelstra)
+start = "2019-12-10"
+end = "2027-06-24"
+notes = "Seed-handling native secp256k1 binding; trusting upstream rust-bitcoin publisher for audit Issue F."
+
+[[trusted.secrecy]]
+criteria = "safe-to-deploy"
+user-id = 19631 # Tony Arcieri (iqlusion) (tony-iqlusion)
+start = "2019-05-23"
+end = "2027-06-23"
+
+[[trusted.shardtree]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2023-09-08"
+end = "2027-06-26"
+
+[[trusted.shardtree]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2022-12-15"
+end = "2027-06-26"
+
+[[trusted.sinsemilla]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2024-12-13"
+end = "2027-06-26"
+
+[[trusted.tonic]]
+criteria = "safe-to-deploy"
+user-id = 3959 # Lucio Franco (LucioFranco)
+start = "2019-10-02"
+end = "2027-06-23"
+
+[[trusted.zcash_address]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-08-20"
+end = "2027-06-23"
+
+[[trusted.zcash_client_backend]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-03-25"
+end = "2027-06-23"
+
+[[trusted.zcash_client_sqlite]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-03-25"
+end = "2027-06-23"
+
+[[trusted.zcash_encoding]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-08-19"
+end = "2027-06-23"
+
+[[trusted.zcash_keys]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-01-15"
+end = "2027-06-23"
+
+[[trusted.zcash_primitives]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-08-20"
+end = "2027-06-23"
+
+[[trusted.zcash_proofs]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-08-20"
+end = "2027-06-23"
+
+[[trusted.zcash_protocol]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-01-27"
+end = "2027-06-23"
+
+[[trusted.zcash_script]]
+criteria = "safe-to-deploy"
+user-id = 159631 # Conrado (conradoplg)
+start = "2022-08-31"
+end = "2027-06-26"
+
+[[trusted.zcash_script]]
+criteria = "safe-to-deploy"
+user-id = 228785 # Alfredo Garcia (oxarbitrage)
+start = "2023-10-18"
+end = "2027-06-26"
+
+[[trusted.zcash_spec]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2023-12-07"
+end = "2027-06-26"
+
+[[trusted.zcash_spec]]
+criteria = "safe-to-deploy"
+user-id = 199950 # Daira-Emma Hopwood (daira)
+start = "2025-02-20"
+end = "2027-06-26"
+
+[[trusted.zcash_transparent]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-12-17"
+end = "2027-06-23"
+
+[[trusted.zip32]]
+criteria = "safe-to-deploy"
+user-id = 6289 # Jack Grigg (str4d)
+start = "2023-12-06"
+end = "2027-06-26"
+
+[[trusted.zip321]]
+criteria = "safe-to-deploy"
+user-id = 169181 # Kris Nuttycombe (nuttycom)
+start = "2024-01-15"
+end = "2027-06-23"

@@ -1,0 +1,92 @@
+use thiserror::Error;
+
+pub type ZeckResult<T> = Result<T, ZeckError>;
+
+#[derive(Debug, Error)]
+pub enum ZeckError {
+    #[error("invalid mnemonic: {0}")]
+    InvalidMnemonic(String),
+
+    #[error("invalid destination address: {0}")]
+    InvalidAddress(String),
+
+    #[error("destination must be a Zcash Unified Address")]
+    DestinationMustBeUnified,
+
+    #[error("destination address is for the wrong network: expected {expected}, got {actual}")]
+    WrongNetwork { expected: String, actual: String },
+
+    #[error("destination must include an Orchard or Sapling receiver")]
+    UnsupportedDestination,
+
+    #[error("invalid scan configuration: {0}")]
+    InvalidConfig(String),
+
+    /// The funds exist but cannot cover the fee to move them.
+    ///
+    /// Distinct from `InvalidConfig`, which is the user setting something
+    /// wrong. Nothing here is misconfigured: the wallet is simply worth less
+    /// than it costs to sweep, and no change to the invocation fixes it.
+    #[error("not economically recoverable: {0}")]
+    BelowDustThreshold(String),
+
+    /// A destination carried the right kind of receiver, but its bytes did
+    /// not decode.
+    ///
+    /// Distinct from having no such receiver at all. Telling someone their
+    /// unified address "has no Sapling receiver" when it has a corrupt one
+    /// sends them looking for a different address instead of a clean copy of
+    /// the one they have.
+    #[error("malformed receiver in destination: {0}")]
+    MalformedReceiver(String),
+
+    #[error("failed to parse date: {0}")]
+    InvalidDate(String),
+
+    #[error("lightwalletd probe failed: {0}")]
+    Lightwalletd(String),
+
+    /// A scan batch has not committed within its budget. Deliberately *not*
+    /// a [`ZeckError::Lightwalletd`]: the stall watchdog observes only that
+    /// `synced_to_height` stopped advancing, which a hung stream and an
+    /// unusually dense block range produce identically. Attributing it to
+    /// the server would be a guess presented to the user as a fact.
+    #[error("scan stalled: {0}")]
+    ScanStalled(String),
+
+    #[error("scan session not found")]
+    UnknownScanHandle,
+
+    #[error("scan was cancelled")]
+    Cancelled,
+
+    #[error("scan is not ready for sweeping: {0}")]
+    ScanNotReady(String),
+
+    #[error("estimated sweep fees exceed the configured maximum: {0}")]
+    MaxFeeExceeded(String),
+
+    #[error("invalid memo: {0}")]
+    InvalidMemo(String),
+
+    #[error("storage error: {0}")]
+    Storage(String),
+
+    #[error("wallet error: {0}")]
+    Wallet(String),
+
+    #[error("transaction build failed: {0}")]
+    TransactionBuild(String),
+
+    #[error("broadcast failed: {0}")]
+    Broadcast(String),
+
+    #[error("serialization error: {0}")]
+    Serialization(String),
+
+    #[error("internal error: {0}")]
+    Internal(String),
+
+    #[error("wallet import failed: {0}")]
+    Import(String),
+}

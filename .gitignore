@@ -1,0 +1,24 @@
+/target
+/node_modules
+/gui/node_modules
+/dist
+/gui/src-tauri/target
+/gui/.vite
+/zeck_data
+*.sqlite
+*.db
+.DS_Store
+
+# Brainstorming visual companion (local, not committed)
+.superpowers/
+
+crates/argos-wallet-import/fuzz/artifacts/
+crates/argos-wallet-import/fuzz/target/
+
+# cargo-fuzz output. The seed corpus (the eight golden wallet fixtures) is
+# tracked; everything the fuzzer mutates from them regenerates locally and
+# would otherwise add megabytes of churn to every fuzz run.
+crates/argos-wallet-import/fuzz/corpus/bdb_walk/*
+!crates/argos-wallet-import/fuzz/corpus/bdb_walk/.gitkeep
+crates/argos-wallet-import/fuzz/artifacts/
+crates/argos-wallet-import/fuzz/target/
