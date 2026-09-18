@@ -508,7 +508,7 @@ impl KeySource for ZcashdPhraseKeySource {
 
         let mut out = [0u8; 32];
         out.copy_from_slice(&h.finalize());
-        Ok(KeySourceFingerprint::from_digest(out))
+        Ok(KeySourceFingerprint::from_bytes(out))
     }
 
     /// Always `None`, deliberately.
